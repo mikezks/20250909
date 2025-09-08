@@ -43,6 +43,7 @@
     "@angular/compiler-cli": "^20.0.0",
     "@ngrx/schematics": "^20.0.1",
     "@ngrx/store-devtools": "^20.0.1",
+    "@softarc/detective": "^1.3.0",
     "@softarc/eslint-plugin-sheriff": "^0.19.2",
     "@softarc/sheriff-core": "^0.19.2",
     "@types/jasmine": "~5.1.0",
