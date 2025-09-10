@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, signal, untracked } from '@angular/core';
+import { afterRenderEffect, Component, computed, effect, inject, Injector, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Flight, FlightFilter, injectTicketsFacade } from '../../logic-flight';
 import { FlightCardComponent, FlightFilterComponent } from '../../ui-flight';
+import { SIGNAL } from '@angular/core/primitives/signals';
 
 
 @Component({
@@ -39,25 +40,9 @@ export class FlightSearchComponent {
       untracked(() => this.search());
     });
 
-    console.log(this.filter().from);
-    this.filter.update(curr => ({ ...curr, from: 'St.Gallen' }));
-    console.log(this.filter().from);
-    this.filter.update(curr => ({ ...curr, from: 'Vaduz' }));
-    console.log(this.filter().from);
-    this.filter.update(curr => ({ ...curr, from: 'Barcelona' }));
-    console.log(this.filter().from);
-    this.filter.update(curr => ({ ...curr, from: 'Madrid' }));
-    console.log(this.filter().from);
-    this.filter.update(curr => ({ ...curr, from: 'Oslo' }));
-    console.log(this.filter().from);
+    // console.log(this.route[SIGNAL]);
 
-    // Glitch-free behavior
-    const counter = signal(0);
-    const isEven = computed(() => counter() % 2 === 0);
-    effect(() => console.log({
-      counter: counter(),
-      isEven: isEven()
-    }));
+    injectSignalsLogger();
   }
 
   protected search(): void {
@@ -85,4 +70,26 @@ export class FlightSearchComponent {
   protected reset(): void {
     this.ticketsFacade.reset();
   }
+}
+
+
+
+export function injectSignalsLogger(): void {
+  const injector = inject(Injector);
+  const getSignalGraph = () => (window as any).ng.ɵgetSignalGraph(injector);
+  const transformToDebugNames = (
+    graph: {
+      edges: { consumer: number; producer: number; }[],
+      nodes: { label: string; kind: string; value: unknown; }[],
+    }
+  ) => graph.edges.map((edge: { consumer: number, producer: number }) => ({
+    consumer: graph.nodes[edge.consumer].label,
+    producer: graph.nodes[edge.producer].label
+  }));
+
+  afterRenderEffect(() => untracked(() => {
+    const graph = getSignalGraph();
+    console.table(graph.nodes);
+    console.table(transformToDebugNames(graph));
+  }));
 }
