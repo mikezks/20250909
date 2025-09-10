@@ -3,6 +3,7 @@ import { afterRenderEffect, Component, computed, effect, inject, Injector, signa
 import { FormsModule } from '@angular/forms';
 import { Flight, injectTicketsFacade } from '../../logic-flight';
 import { FlightCardComponent, FlightFilterComponent } from '../../ui-flight';
+import { BookStore } from '../../logic-flight/state/booking.store';
 
 
 @Component({
@@ -17,6 +18,7 @@ import { FlightCardComponent, FlightFilterComponent } from '../../ui-flight';
 })
 export class FlightSearchComponent {
   private ticketsFacade = injectTicketsFacade();
+  private store = inject(BookStore);
 
   protected filter = signal({
     from: 'Paris',
